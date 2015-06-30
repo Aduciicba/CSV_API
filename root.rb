@@ -23,7 +23,13 @@ get '/get_column' do
 end
 
 post '/get_column' do
-  range = csv_file[params[:column_name]]
+  puts params[:column_name]
+  int = Integer(params[:column_name]) rescue nil
+  range = nil
+  puts int
+  range = csv_file[params[:column_name].to_s] if int == nil
+  range = csv_file[int] if int != nil
+  puts range
   redirect '/main_csv', locals: {:csv_file => range}
 end
 
