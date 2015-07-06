@@ -26,7 +26,50 @@ class CSV_file
     @col_count = @headers.count
   end
 
-   def get_array_range(row_idx1, col_idx1, row_idx2, col_idx2)
+  def has_column_by_name(name)
+    @headers.include? name
+  end
+
+  def has_column_by_idx(idx)
+    idx >= 0 and idx < @headers.count
+  end
+
+  def is_number_idx(col_id)
+    true if Integer(col_id) rescue false
+  end
+
+  def has_such_column(col_id)
+    if  !is_number_idx(col_id)
+      has_column_by_name(col_id)
+    else
+      has_column_by_idx(Integer(col_id))
+    end
+  end
+
+  def has_such_row(row_idx)
+    if is_number_idx(row_idx) then
+      row_idx.to_i >= 0 and row_idx.to_i < @row_count
+    else
+      false
+    end
+  end
+
+  def get_error_values
+    return ['Error:'].to_json, [['Bad range parameters: no such row/column']].to_json
+  end
+
+  def get_col_index(col_id)
+    idx = Integer(col_id) if is_number_idx(col_id)
+    idx = @headers.include? col_id ? @headers.index(col_id).to_i : -1 unless is_number_idx(col_id)
+    idx
+  end
+
+  def get_row_index(row_idx)
+    idx = (is_number_idx(row_idx) ? Integer(row_idx) : -1)
+    idx
+  end
+
+  def get_array_range(row_idx1, col_idx1, row_idx2, col_idx2)
     range_table = Array.new
     #puts row_idx1, col_idx1, row_idx2, col_idx2
 
@@ -47,24 +90,25 @@ class CSV_file
   end
 
   def get_range(row_idx1, col_idx1, row_idx2, col_idx2)
-    headers, range = get_array_range(row_idx1, col_idx1, row_idx2, col_idx2)
-    return headers.to_json, range.to_json
+    if !(has_such_column(col_idx1) and
+         has_such_column(col_idx2) and
+         has_such_row(row_idx1) and
+         has_such_row(row_idx2) )
+      get_error_values
+    else
+      headers, range = get_array_range(get_row_index(row_idx1), get_col_index(col_idx1), get_row_index(row_idx2), get_col_index(col_idx2))
+      return headers.to_json, range.to_json
+    end
   end
 
-  def get_column(col_idx)
-    idx = 0
-
-    if col_idx.is_a? String
-      idx = @headers.index(col_idx).to_i
-    else
-      idx = col_idx.to_i
-    end
-    puts col_idx, idx, idx.class
+  def get_column(col_id)
+    idx = get_col_index(col_id)
     get_range(0, idx, @row_count - 1, idx)
   end
 
   def get_row(row_idx)
-    get_range(row_idx, 0, row_idx, @col_count - 1)
+    idx = get_row_index(row_idx)
+    get_range(idx, 0, idx, @col_count - 1)
   end
 
   def get_file

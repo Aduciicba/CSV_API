@@ -3,12 +3,14 @@ require 'json'
 require_relative 'csv_file'
 
 c = CSV_file.new('f:/test_file.csv', ';')
-a,b  = c.get_file
+#a,b  = c.has_such_row('1yyy')
 
-j = JSON.parse(b)
-j.each do |row|
-  puts row.class
-end
+# j = JSON.parse(b)
+# j.each do |row|
+#   puts row.class
+# end
+
+puts c.get_column('4')
 
 #puts JSON.parse(b.to_json)[0].is_a? Array
 
