@@ -1,8 +1,10 @@
 
 require 'sinatra'
-require 'csv'
+require 'json'
+require_relative 'csv_file'
 
-csv_file = nil;
+my_csv = nil;
+current_headers, current_table = nil, nil
 
 get '/' do
   "Hello, guy! Let's <a href=""/auth"">authorizing</a> and start working!"
@@ -14,8 +16,13 @@ end
 
 post '/auth' do
   puts params
-  csv_file = CSV.read('f:/test_file.csv', { :col_sep => ';', headers:true,  encoding: 'UTF-8' })#CSV.read('f:/test_file.csv', col_sep: "$", encoding: "UTF-8")
-  redirect '/main_csv'
+  my_csv = CSV_file.new('f:/test_file.csv', ';')
+  current_headers, current_table = my_csv.get_file
+  '-------'
+  puts JSON.parse(current_table)[0].is_a? Array
+  puts JSON.parse(current_table)[0]
+  #puts tmp_headers.is_a? Array
+  redirect '/csv_table_view' #, locals: {:csv_headers => tmp_headers, :csv_table => tmp_table}
 end
 
 get '/get_column' do
@@ -24,15 +31,13 @@ end
 
 post '/get_column' do
   puts params[:column_name]
-  int = Integer(params[:column_name]) rescue nil
-  range = nil
-  puts int
-  range = csv_file[params[:column_name].to_s] if int == nil
-  range = csv_file[int] if int != nil
-  puts range
-  redirect '/main_csv', locals: {:csv_file => range}
+  current_headers, current_table = my_csv.get_column(params[:column_name])
+  redirect '/csv_table_view'
 end
 
-get '/main_csv' do
-  erb :'main_csv', locals: {:csv_file => csv_file}
+get '/csv_table_view' do
+  if params[:type] == 'all'
+    current_headers, current_table = my_csv.get_file
+  end
+  erb :'csv_table_view', locals: {:csv_headers => current_headers, :csv_table => current_table}
 end

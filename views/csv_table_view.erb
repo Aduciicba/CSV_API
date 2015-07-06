@@ -1,0 +1,61 @@
+
+<style type="text/css">
+    table {
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+    td, th {
+        padding: 5px ;
+        border: 1px solid black; /* Рамка вокруг таблицы */
+    }
+    th {
+        font-size: 18pt;
+        font-weight: bold;
+    }
+</style>
+
+<h2>CSV file</h2>
+
+<table style="border: hidden; border-color: transparent">
+  <tr>
+    <td><a href="/csv_table_view?type=all">All file</a></td>
+    <td><a href="/edit_cell">Edit some cell</a></td>
+    <td><a href="/get_column">Get column</a></td>
+    <td><a href="/get_row">Get row</a></td>
+    <td><a href="/get_range">Get range</a></td>
+  </tr>
+</table>
+
+<br>
+<% require 'json' %>
+<% table = JSON.parse(csv_table) %>
+<% headers = JSON.parse(csv_headers) %>
+
+<table>
+  <th>
+    <% headers.each do |col| %>
+      <td><%= col%> </td>
+  <% end %>
+  </th>
+  <tr>
+    <% (0..headers.count).each {|i| %>
+        <td>C<%= i%> </td>
+    <%}%>
+  </tr>
+  <% i = 1 %>
+  <% table.each do |row| %>
+      <tr>
+        <td>R<%= i%></td>
+        <% row.each do |col| %>
+            <td><%= col%> </td>
+        <% end %>
+        <% i = i + 1 %>
+      </tr>
+  <% end %>
+</table>
+
+
+
+
+
+
