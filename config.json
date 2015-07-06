@@ -1,0 +1,16 @@
+{
+	"users_auth_data": [
+		{
+		  "login": "kate",
+		  "password": "123"
+		},
+		{
+		  "login": "Ilya",
+		  "password": "wim"
+		},
+		{
+		  "login": "user3",
+		  "password": "3"
+		}
+	]
+}		

@@ -10,7 +10,7 @@ c = CSV_file.new('f:/test_file.csv', ';')
 #   puts row.class
 # end
 
-puts c.get_column('4')
+puts Dir.pwd
 
 #puts JSON.parse(b.to_json)[0].is_a? Array
 

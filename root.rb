@@ -2,12 +2,14 @@
 require 'sinatra'
 require 'json'
 require_relative 'csv_file'
+require_relative 'auth'
 
 my_csv = nil;
+test_file_name = Dir.pwd + '/test_file.csv'
 current_headers, current_table = nil, nil
 
 get '/' do
-  "Hello, guy! Let's <a href=""/auth"">authorizing</a> and start working!"
+  "Hello! Let's <a href=""/auth"">authorizing</a> and start working!"
 end
 
 get '/auth' do
@@ -16,17 +18,23 @@ end
 
 post '/auth' do
   puts params
-  my_csv = CSV_file.new('f:/test_file.csv', ';')
-  current_headers, current_table = my_csv.get_file
-  redirect '/what_to_do'
+  a = Auth.new(params[:login], params[:password])
+  if !a.check_authorization
+    "Sorry, we don't know you:( <br> " +
+    "Maybe you are Ilya?) If that, <a href='/auth'>try again</a> with your name as login, password is your initials in lowercase:P"
+  else
+    my_csv = CSV_file.new(test_file_name, ';')
+    current_headers, current_table = my_csv.get_file
+    redirect '/what_to_do'
+  end
 end
 
 get '/what_to_do' do
-  "<strong>Now you can get some JSON data: </strong><br>" +
+  "<strong>Now you can get some JSON data: </strong><br><br>" +
   "1. To open some csv with ; separator go to /open_file?path=your path <br>" +
   "2. To get some column put /get_column_json?column_name=your column name or index <br>" +
   "3. To get some row put /get_row_json?row_number=your row_number <br>" +
-  "4. To get range put /get_range_json?row1={range left corner row_number};col1={range left corner col_number};row2={range right corner row_number};col2={range right corner col_number}; <br>" +
+  "4. To get range put /get_range_json?row1={range left corner row_number};col1={range left corner col_number};row2={range right corner row_number};col2={range right corner col_number}; <br><br>" +
   "or go to <a href=""/csv_table_view"">csv table view</a>.."
 end
 
